@@ -5,7 +5,7 @@ if [ -z "$KSU" ]; then
     abort
 fi
 
-set_perm "$MODPATH/bin/ipset" 0 0 0644
+set_perm "$MODPATH/bin/ipset" 0 0 0777
 
 [ -d "$MODPATH/netfilter" ] && {
     rm -rf "/data/adb/netfilter"
