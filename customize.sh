@@ -5,9 +5,8 @@ if [ -z "$KSU" ]; then
     abort
 fi
 
-set_perm_recursive "$MODPATH/bin" 0 0 0755 0755
-
 mv -f "$MODPATH/bin/ipset" "/data/adb/ksu/bin/"
+chmod 755 /data/adb/ksu/bin/ipset
 rm -rf "$MODPATH/bin"
 
 [ -d "$MODPATH/netfilter" ] && {
