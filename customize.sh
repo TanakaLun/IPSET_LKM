@@ -21,13 +21,16 @@ fi
 
 set_perm_recursive "$TARGET_DIR/bin" 0 0 0755 0755
 
-if [ -L "/data/adb/ksu/bin/ipset" ]; then
-    rm -f "/data/adb/ksu/bin/ipset"
-elif [ -e "/data/adb/ksu/bin/ipset" ]; then
-    ui_print "! File exists at /data/adb/ksu/bin/ipset and is not a symlink"
+BIN_DIR=$(echo "$PATH" | tr ':' '\n' | grep '/data/.*bin' | head -1)
+
+TARGET_LINK="$BIN_DIR/ipset"
+[ -L "$TARGET_LINK" ] && rm -f "$TARGET_LINK"
+if [ -e "$TARGET_LINK" ]; then
+    ui_print "! File exists at $TARGET_LINK and is not a symlink"
     abort
 fi
-ln -s "$TARGET_DIR/bin/ipset" "/data/adb/ksu/bin/ipset"
+
+ln -s "$TARGET_DIR/bin/ipset" "$TARGET_LINK"
 
 ui_print "Binary Installation completed. Binary placed in $TARGET_DIR/bin"
 
@@ -35,5 +38,5 @@ ui_print "Binary Installation completed. Binary placed in $TARGET_DIR/bin"
     rm -rf "/data/adb/netfilter"
     mv "$MODPATH/netfilter" "/data/adb/"
     chmod -R 755 "/data/adb/netfilter"
-    ui_print "- IP-SET has been installed"
+    ui_print "- IPSET has been installed"
 }
