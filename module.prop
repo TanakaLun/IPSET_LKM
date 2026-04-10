@@ -1,5 +1,5 @@
 id=IPSET
-name=IP-SET LKM For A12-5.10
-version=a12-5.10
-versionCode=1
+name=IPSET LKM For GKI Devices
+version=mafuyo
+versionCode=6
 author=TanakaLun
