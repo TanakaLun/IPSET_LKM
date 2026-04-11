@@ -1,9 +1,4 @@
 #!/system/bin/sh
-if ! command -v ksud >/dev/null 2>&1; then
-    ui_print "! ksud command not found. This module requires ksud support."
-    abort
-fi
-
 MODID=$(grep_prop id "$MODPATH/module.prop")
 if [ -z "$MODID" ]; then
     ui_print "! Failed to read module ID."
@@ -33,7 +28,7 @@ fi
 
 ln -s "$TARGET_DIR/bin/ipset" "$TARGET_LINK"
 
-ui_print "Binary Installation completed. Binary placed in $TARGET_DIR/bin"
+ui_print "- Binary Installation completed. Binary placed in $TARGET_DIR/bin"
 
 [ -d "$MODPATH/netfilter" ] && {
     rm -rf "/data/adb/netfilter"
