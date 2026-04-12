@@ -1,5 +1,5 @@
 id=ipset
 name=IPSET LKM For GKI Devices
 version=isshiki
-versionCode=15
+versionCode=16
 author=TanakaLun
