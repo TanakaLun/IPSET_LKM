@@ -7,6 +7,7 @@ fi
 
 TARGET_DIR="/data/adb/modules/$MODID"
 mkdir -p "$TARGET_DIR"
+
 if [ -d "$MODPATH/bin" ]; then
     cp -rf "$MODPATH/bin" "$TARGET_DIR/"
 else
@@ -17,18 +18,55 @@ fi
 set_perm_recursive "$TARGET_DIR/bin" 0 0 0755 0755
 set_perm_recursive "$MODPATH/bin" 0 0 0755 0755
 
-BIN_DIR=$(echo "$PATH" | tr ':' '\n' | grep '/data/.*bin' | head -1)
-
-TARGET_LINK="$BIN_DIR/ipset"
-[ -L "$TARGET_LINK" ] && rm -f "$TARGET_LINK"
-if [ -e "$TARGET_LINK" ]; then
-    ui_print "! File exists at $TARGET_LINK and is not a symlink"
-    abort
+if [ "$MAGISK_VER_CODE" ]; then
+    ui_print "- Detected Magisk environment"
+    
+    mkdir -p "$MODPATH/system/bin"
+    
+    if [ -f "$MODPATH/bin/ipset" ]; then
+        mv "$MODPATH/bin/ipset" "$MODPATH/system/bin/ipset"
+        ui_print "- ipset moved to $MODPATH/system/bin for Magisk by mount"
+    else
+        ui_print "! ipset binary not found in bin folder"
+        abort
+    fi
+    
+    set_perm "$MODPATH/system/bin/ipset" 0 0 0755
+    
+    ui_print "- ipset will be mounted to /system/bin via Magisk"
+    
+else
+    ui_print "- Detected KernelSU/APatch environment"
+    
+    if [ "$KSU" ]; then
+        BIN_DIR="/data/adb/ksu/bin"
+    elif [ "$APATCH" ]; then
+        BIN_DIR="/data/adb/ap/bin"
+    fi
+    
+    mkdir -p "$BIN_DIR"
+    
+    TARGET_LINK="$BIN_DIR/ipset"
+    
+    if [ -f "$TARGET_LINK" ]; then
+        if [ ! -L "$TARGET_LINK" ] && cmp -s "$TARGET_LINK" "$TARGET_DIR/bin/ipset"; then
+            ui_print "- ipset binary already exists at $TARGET_LINK, skipping symlink"
+        else
+            ui_print "- Overwriting existing ipset at $TARGET_LINK"
+            rm -f "$TARGET_LINK"
+            ln -s "$TARGET_DIR/bin/ipset" "$TARGET_LINK"
+        fi
+    elif [ -L "$TARGET_LINK" ]; then
+        rm -f "$TARGET_LINK"
+        ln -s "$TARGET_DIR/bin/ipset" "$TARGET_LINK"
+        ui_print "- Symbolic link created at $TARGET_LINK"
+    else
+        ln -s "$TARGET_DIR/bin/ipset" "$TARGET_LINK"
+        ui_print "- Symbolic link created at $TARGET_LINK"
+    fi
 fi
 
-ln -s "$TARGET_DIR/bin/ipset" "$TARGET_LINK"
-
-ui_print "- Binary Installation completed. Binary placed in $TARGET_DIR/bin"
+ui_print "- Binary Installation completed."
 
 [ -d "$MODPATH/netfilter" ] && {
     rm -rf "/data/adb/netfilter"
