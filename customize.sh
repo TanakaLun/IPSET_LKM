@@ -18,29 +18,12 @@ fi
 set_perm_recursive "$TARGET_DIR/bin" 0 0 0755 0755
 set_perm_recursive "$MODPATH/bin" 0 0 0755 0755
 
-if [ "$MAGISK_VER_CODE" ]; then
-    ui_print "- Detected Magisk environment"
-    
-    mkdir -p "$MODPATH/system/bin"
-    
-    if [ -f "$MODPATH/bin/ipset" ]; then
-        mv "$MODPATH/bin/ipset" "$MODPATH/system/bin/ipset"
-        ui_print "- ipset moved to $MODPATH/system/bin for Magisk by mount"
-    else
-        ui_print "! ipset binary not found in bin folder"
-        abort
-    fi
-    
-    set_perm "$MODPATH/system/bin/ipset" 0 0 0755
-    
-    ui_print "- ipset will be mounted to /system/bin via Magisk"
-    
-else
+if [ "$KSU" ] || [ "$APATCH" ]; then
     ui_print "- Detected KernelSU/APatch environment"
     
     if [ "$KSU" ]; then
         BIN_DIR="/data/adb/ksu/bin"
-    elif [ "$APATCH" ]; then
+    else
         BIN_DIR="/data/adb/ap/bin"
     fi
     
@@ -64,6 +47,27 @@ else
         ln -s "$TARGET_DIR/bin/ipset" "$TARGET_LINK"
         ui_print "- Symbolic link created at $TARGET_LINK"
     fi
+
+elif [ "$MAGISK_VER_CODE" ]; then
+    ui_print "- Detected Magisk environment"
+    
+    mkdir -p "$MODPATH/system/bin"
+    
+    if [ -f "$MODPATH/bin/ipset" ]; then
+        mv "$MODPATH/bin/ipset" "$MODPATH/system/bin/ipset"
+        ui_print "- ipset moved to $MODPATH/system/bin for Magisk mount"
+    else
+        ui_print "! ipset binary not found in bin folder"
+        abort
+    fi
+    
+    set_perm "$MODPATH/system/bin/ipset" 0 0 0755
+        
+    ui_print "- ipset will be mounted to /system/bin via Magisk"
+    
+else
+    ui_print "! Unsupported or recovery environment"
+    abort
 fi
 
 ui_print "- Binary Installation completed."
