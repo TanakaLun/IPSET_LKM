@@ -4,7 +4,6 @@ cd /data/adb/netfilter || exit
 
 i() { $MODDIR/bin/ko-loader "$@"; }
 
-i iptables/ip6table_nat.ko
 i ipset/ip_set.ko
 
 for m in bitmap_ip bitmap_ipmac bitmap_port; do
